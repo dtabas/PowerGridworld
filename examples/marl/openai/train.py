@@ -280,6 +280,8 @@ def train(arglist):
         episode_step = 0
         train_step = 0
         t_start = time.time()
+        
+        dual_list = []
 
         print('Starting iterations...')
         while True:
@@ -368,6 +370,7 @@ def train(arglist):
                             [np.mean(rew[-arglist.save_rate:]) for rew in
                              agent_rewards], round(time.time() - t_start, 3)))
 
+                
                 final_p_loss.append(np.mean(mean_p_loss))
                 final_q_loss.append(np.mean(mean_q_loss))
                 mean_p_loss = []
@@ -381,6 +384,8 @@ def train(arglist):
                 for rew in agent_rewards:
                     final_ep_ag_rewards.append(np.mean(rew[
                                                        -arglist.save_rate:]))
+
+                dual_list.append(env.ma_env.VV_UNIT_PENALTY)
 
             # saves episode reward periodically for plotting training curves.
             if len(episode_rewards) % 500 == 0:
@@ -407,6 +412,10 @@ def train(arglist):
                 vv_file_name = curve_dir + arglist.exp_name + '_vvio.pkl'
                 with open(vv_file_name, 'wb') as fp:
                     pickle.dump(final_voltage_violation, fp)
+                    
+                dual_file_name = curve_dir + arglist.exp_name + '_dual.pkl'
+                with open(dual_file_name, 'wb') as fp:
+                    pickle.dump(dual_list, fp)
 
                 if len(episode_rewards) >= arglist.num_episodes:
                     print('...Finished total of {} episodes.'.format(

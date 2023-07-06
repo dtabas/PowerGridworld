@@ -11,17 +11,17 @@ MAX_ITER = 350
 
 
 def plot_learning_curves(data_dir, exp_name):
-
-    items = ['rewards', 'agrewards', 'ploss', 'qloss', 'vvio']
+    
+    items = ['rewards', 'agrewards', 'ploss', 'qloss', 'vvio','dual']
     logged_data = {x: [] for x in items}
 
     for item in items:
-        try:
-            file_name = os.path.join(data_dir, exp_name + '_' + item + '.pkl')
-            with open(file_name, 'rb') as fp:
-                logged_data[item] = pickle.load(fp)
-        except FileNotFoundError:
-            continue
+        #try:
+        file_name = os.path.join(data_dir, exp_name + '_' + item + '.pkl')
+        with open(file_name, 'rb') as fp:
+            logged_data[item] = pickle.load(fp)
+        #except FileNotFoundError:
+            #continue
 
     # Imply the agent number
     agent_num = int(
@@ -31,7 +31,7 @@ def plot_learning_curves(data_dir, exp_name):
     logged_data['agrewards'] = logged_data['agrewards'].reshape(
         (-1, agent_num))
 
-    fig, axes = plt.subplots(3, 2)
+    fig, axes = plt.subplots(4, 2)
 
     for agent_idx in range(agent_num):
         axes[0, 0].plot(-1 * logged_data['agrewards'][:, agent_idx][:MAX_ITER],
@@ -60,6 +60,8 @@ def plot_learning_curves(data_dir, exp_name):
     axes[1, 1].set_ylabel(r'$\mathcal{L}_{critic}$', fontsize=PLOT_FONT_SIZE)
     axes[1, 1].yaxis.set_label_position("right")
     axes[1, 1].yaxis.tick_right()
+    
+    axes[3,0].plot(logged_data['dual'][:MAX_ITER])
 
     gs = axes[2, 0].get_gridspec()
     # remove the underlying axes
@@ -84,7 +86,9 @@ def plot_learning_curves(data_dir, exp_name):
 
 if __name__ == '__main__':
 
-    data_dir = 'paper_results/learning_curves'
+    #data_dir = 'paper_results/learning_curves'
+    #data_dir = 'trained_policy_gridworld/default_experiment-2023-07-05-15-55-21-364fbe3b5e274ab9907c68bfa06f946a/learning_curves'
+    data_dir = 'trained_policy_gridworld/default_experiment-2023-07-05-17-21-45-b4aeeba242424932bd7698e1b17e7129/learning_curves'
 
     name = 'default_experiment'
 
