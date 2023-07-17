@@ -422,6 +422,12 @@ def train(arglist):
                         len(episode_rewards)))
                     break
 
+# Register the environment
+from gym.envs.registration import register
+register(
+    id='MultiBuilding-v0',
+    entry_point='examples.marl.openai.train:make_env',
+)
 
 if __name__ == '__main__':
     arglist = parse_args()
