@@ -8,6 +8,8 @@ see README under examples/marl/openai for details.
 
 """
 
+# This is an example environment for use with epymarl. This file creates a 3-agent building environment and registers it in gym. 
+
 import argparse
 import json
 import logging
@@ -45,7 +47,7 @@ class CoordinatedMultiBuildingControlEnv(MultiAgentEnv):
     """
 
     VOLTAGE_LIMITS = [0.95, 1.05]
-    VV_UNIT_PENALTY = 1e4
+    VV_UNIT_PENALTY = 0 # 1e4
 
     # Overwriting the default transform behavior.
     def reward_transform(self, rew_dict) -> dict:
@@ -58,7 +60,8 @@ class CoordinatedMultiBuildingControlEnv(MultiAgentEnv):
         # split the penalty equally among agents.
         agent_num = len(rew_dict)
         for key in rew_dict.keys():
-            rew_dict[key] -= (sys_penalty / agent_num)
+            #rew_dict[key] -= (sys_penalty / agent_num)
+            rew_dict[key] = (rew_dict[key],voltage_violation)
 
         return rew_dict
 
@@ -84,7 +87,7 @@ class CoordinatedMultiBuildingControlEnv(MultiAgentEnv):
             self.VOLTAGE_LIMITS[0] - common_bus_voltage,
             common_bus_voltage - self.VOLTAGE_LIMITS[1]
         ])
-
+                
         return voltage_violation
 
 def make_env():
@@ -111,11 +114,8 @@ def make_env():
         env_config
     )
     
-    import ipdb
-    # ipdb.set_trace()
-    
     env.n_agents = env.n
-    env.n_constraints = 0
+    env.n_constraints = 1
 
     return env
 
